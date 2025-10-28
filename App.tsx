@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 
 const LoadingSpinner: React.FC = () => (
@@ -21,7 +20,7 @@ const App: React.FC = () => {
 
     const handleFetch = useCallback(async () => {
         if (!targetUrl.trim()) {
-            setError('Please enter a target URL.');
+            setError('请输入目标 URL。');
             return;
         }
 
@@ -33,7 +32,7 @@ const App: React.FC = () => {
         try {
             new URL(fullUrl);
         } catch (_) {
-            setError('Please enter a valid URL.');
+            setError('请输入一个有效的 URL。');
             return;
         }
 
@@ -48,21 +47,23 @@ const App: React.FC = () => {
             const responseText = await response.text();
 
             if (!response.ok) {
-                throw new Error(`Request failed: ${response.status} ${response.statusText}. Response: ${responseText}`);
+                throw new Error(`请求失败: ${response.status} ${response.statusText}。 响应: ${responseText}`);
             }
 
             try {
+                // 美化JSON格式
                 const jsonObj = JSON.parse(responseText);
                 setData(JSON.stringify(jsonObj, null, 2));
             } catch (e) {
+                // 如果不是JSON，直接显示原文
                 setData(responseText);
             }
 
         } catch (e) {
             if (e instanceof Error) {
-                setError(`Fetch Error: ${e.message}. Note: The CORS proxy endpoint must be configured on this domain for this to work.`);
+                setError(`请求错误: ${e.message}。 注意：CORS 代理端点需要在此域上正确配置才能工作。`);
             } else {
-                setError('An unknown error occurred.');
+                setError('发生未知错误。');
             }
         } finally {
             setIsLoading(false);
@@ -78,9 +79,12 @@ const App: React.FC = () => {
         <div className="min-h-screen text-slate-200 flex flex-col items-center justify-center p-4 font-sans">
             <div className="w-full max-w-3xl mx-auto">
                 <header className="text-center mb-8">
-                    <h1 className="text-4xl md:text-5xl font-bold text-sky-400 mb-2">CORS Proxy Service</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold text-sky-400 mb-2">CORS 代理服务</h1>
                     <p className="text-slate-400 text-lg">
-                        Fetch remote resources without CORS issues via a backend proxy.
+                        将请求通过后端代理转发，以解决 CORS 跨域问题。
+                    </p>
+                     <p className="text-slate-500 mt-2 text-sm">
+                        用法：在下方输入框填入目标URL，请求将通过 <code className="bg-slate-700 text-sky-400 px-1 py-0.5 rounded mx-1">/?target=&lt;您的目标URL&gt;</code> 发送。
                     </p>
                 </header>
                 
@@ -94,7 +98,7 @@ const App: React.FC = () => {
                                 type="text"
                                 value={targetUrl}
                                 onChange={(e) => setTargetUrl(e.target.value)}
-                                placeholder="Enter target URL (e.g., api.example.com/data)"
+                                placeholder="输入目标 URL (例如: api.example.com/data)"
                                 className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 placeholder-slate-400"
                                 disabled={isLoading}
                             />
@@ -104,7 +108,7 @@ const App: React.FC = () => {
                             disabled={isLoading}
                             className="px-6 py-3 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-500 disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors duration-300 shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2"
                         >
-                            {isLoading ? 'Fetching...' : 'Fetch'}
+                            {isLoading ? '请求中...' : '获取'}
                         </button>
                     </form>
 
@@ -112,7 +116,7 @@ const App: React.FC = () => {
                         {isLoading && <LoadingSpinner />}
                         {error && (
                             <div className="text-red-400 p-4 bg-red-900/30 rounded-md">
-                                <p className="font-bold">Error:</p>
+                                <p className="font-bold">错误:</p>
                                 <p className="whitespace-pre-wrap break-words">{error}</p>
                             </div>
                         )}
@@ -123,14 +127,14 @@ const App: React.FC = () => {
                         )}
                         {!isLoading && !error && !data && (
                             <div className="flex items-center justify-center h-full text-slate-500">
-                                <p>Response will appear here...</p>
+                                <p>响应内容将在此处显示...</p>
                             </div>
                         )}
                     </div>
                 </main>
                 
                 <footer className="text-center mt-8 text-slate-500 text-sm">
-                    <p>This frontend assumes a proxy is available at <code className="bg-slate-700 px-1 py-0.5 rounded">/?target=&lt;url&gt;</code></p>
+                    <p>此前端页面假定代理服务部署在当前域名的 <code className="bg-slate-700 px-1 py-0.5 rounded">/?target=&lt;url&gt;</code> 路径。</p>
                 </footer>
             </div>
         </div>
